@@ -224,3 +224,5 @@ __MACOSX/**
 checkpoints/
 
 .vscode/
+
+wandb/
