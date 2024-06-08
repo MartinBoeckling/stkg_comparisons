@@ -10,13 +10,18 @@ This repository contains code and data for comparing spatial-temporal knowledge 
 ### Python
 Set up the Python environment:
 
-`conda env create -f environment.yml
-conda activate stkg_comparisons`
+```
+conda env create -f environment.yml
+conda activate stkg_comparisons
+```
 ### R
 Set up the R environment:
 
-`conda env create -f r-environment.yml
-conda activate r-stkg_comparisons`
+```
+conda env create -f r-environment.yml
+conda activate r-stkg_comparisons
+```
+
 ## Usage
 ### Data
 ### Use Cases
