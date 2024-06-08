@@ -30,4 +30,13 @@ Overall we differentiate between two datasets, which we use for the overall eval
 In order to run the experiments, please have a look at the shell file containing the script to run the experiments:
 
 [Shell Script](use_cases/airbnb/script_run.sh)
+
+The datasets needed to run the scripts can be found under the following [SharePoint page](https://1drv.ms/f/s!AijsqF7qjxxBiaQhYy7cMEAM9CPShw?e=Latbm0)
 #### Wildfire
+The first data preparation needs to be run with R. To have all functionalities of R, it is recommended to run R in interactive mode
+
+In order to run the experiments, please have a look at the shell file containing the script to run the experiments:
+
+[Shell Script](use_cases/wildfire/script_run.sh)
+
+The datasets needed to run the scripts can be found under the following [OneDrive link](https://1drv.ms/u/s!AijsqF7qjxxBiOp9XJ7D7UMut5x2Vg?e=yj1IFN)

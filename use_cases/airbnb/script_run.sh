@@ -136,6 +136,12 @@ python data_preparation/rdf2vec.py \
     --alignmentprojection \
     --grid_path "data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet"
 
+python data_preparation/worldkg/rdf2vec_vector_prep.py \
+    --mapper_path "data/airbnb/base_data/worldkg_mapper.parquet"\
+    --grid_path "data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet"\
+    --vector_path "data/airbnb/knowledge_graph/worldkg/vector/vectorDf.parquet"\
+    --target_path "data/airbnb/knowledge_graph/worldkg/vector/vectorDf.parquet"
+
 python use_cases/airbnb/vector_join.py \
     --base_path "data/airbnb/ml_data/airbnb_base.parquet" \
     --vector_path "data/airbnb/knowledge_graph/worldkg/vector/vectorDf.parquet" \
@@ -152,6 +158,21 @@ python data_preparation/complex.py \
     --device "cuda:0" \
     --checkpoint "/ceph/mboeckli/stkg_comparison/checkpoints"
 
+python data_preparation/complex_vector.py \
+    --folder_path data/airbnb/knowledge_graph/worldkg/transe_vector \
+    --output_path data/airbnb/knowledge_graph/worldkg/transe_vector/vectorDf.parquet \
+    --grid_id_path data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet \
+    --mapper_path data/airbnb/base_data/worldkg_mapper.parquet
+
+python use_cases/airbnb/vector_join.py \
+    --base_path "data/airbnb/ml_data/airbnb_base.parquet" \
+    --vector_path "data/airbnb/knowledge_graph/worldkg/transe_vector/vectorDf.parquet" \
+    --output_path "data/airbnb/ml_data/airbnb_hybrid_transe_worldkg.parquet"
+
+python modeling/xgboost_regression.py \
+    -p data/airbnb/ml_data/airbnb_hybrid_transe_worldkg.parquet \
+    -d 2017-04-01
+
 python data_preparation/complex.py \
     --kg_path "data/airbnb/knowledge_graph/worldkg/knowledgegraph" \
     --log_dir "data/airbnb/knowledge_graph/worldkg/complex_vector" \
@@ -160,7 +181,95 @@ python data_preparation/complex.py \
     --checkpoint "/ceph/mboeckli/stkg_comparison/checkpoints"
 
 python data_preparation/complex_vector.py \
+    --folder_path data/airbnb/knowledge_graph/worldkg/complex_vector \
+    --output_path data/airbnb/knowledge_graph/worldkg/complex_vector/vectorDf.parquet \
+    --grid_id_path data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet \
+    --mapper_path data/airbnb/base_data/worldkg_mapper.parquet
+
+python use_cases/airbnb/vector_join.py \
+    --base_path "data/airbnb/ml_data/airbnb_base.parquet" \
+    --vector_path "data/airbnb/knowledge_graph/worldkg/complex_vector/vectorDf.parquet" \
+    --output_path "data/airbnb/ml_data/airbnb_hybrid_complex_worldkg.parquet"
+
+python modeling/xgboost_regression.py \
+    -p data/airbnb/ml_data/airbnb_hybrid_complex_worldkg.parquet \
+    -d 2017-04-01
+
+# KnowWhereGraph preparation
+python data_preparation/KWG/h3_to_s2.py \
+    --path data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet \
+    --target_path data/airbnb/base_data/h3_s2_data.parquet
+
+python data_preparation/KWG/SPARQLKWG.py \
+    --mapper_path data/airbnb/base_data/h3_s2_data.parquet \
+    --target_path data/airbnb/knowledge_graph/KnowWhereGraph/triple_data.parquet
+
+python data_preparation/KWG/kwgPreparation.py \
+    --path data/airbnb/knowledge_graph/KnowWhereGraph/triple_data.parquet \
+    --target_path data/airbnb/knowledge_graph/KnowWhereGraph/knowledgegraph \
+    --start_date 2016-09-01 \
+    --end_date 2017-09-01 \
+    --time_frequency MS
+
+python data_preparation/rdf2vec.py \
+    --path "data/airbnb/knowledge_graph/KnowWhereGraph/knowledgegraph"\
+    --distance 4 \
+    --walknumber "500" \
+    --train \
+    --chunksize 100 \
+    --savepath "data/airbnb/knowledge_graph/KnowWhereGraph/vector" \
+    --alignmentprojection \
+    --grid_path "data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet"
+
+python use_cases/airbnb/vector_join.py \
+    --base_path "data/airbnb/ml_data/airbnb_base.parquet" \
+    --vector_path "data/airbnb/knowledge_graph/KnowWhereGraph/vector/vectorDf.parquet" \
+    --output_path "data/airbnb/ml_data/airbnb_hybrid_rdf2vec_KnowWhereGraph.parquet"
+
+python modeling/xgboost_regression.py \
+    -p data/airbnb/ml_data/airbnb_hybrid_rdf2vec_KnowWhereGraph.parquet \
+    -d 2017-04-01
+
+python data_preparation/complex.py \
+    --kg_path "data/airbnb/knowledge_graph/KnowWhereGraph/knowledgegraph" \
+    --log_dir "data/airbnb/knowledge_graph/KnowWhereGraph/transe_vector" \
+    --model "transe" \
+    --device "cuda:0" \
+    --checkpoint "/ceph/mboeckli/stkg_comparison/checkpoints"
+
+python data_preparation/complex_vector.py \
     --folder_path data/airbnb/knowledge_graph/KnowWhereGraph/transe_vector \
     --output_path data/airbnb/knowledge_graph/KnowWhereGraph/transe_vector/vectorDf.parquet \
     --grid_id_path data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet \
     --mapper_path data/airbnb/base_data/h3_s2_data.parquet
+
+python use_cases/airbnb/vector_join.py \
+    --base_path "data/airbnb/ml_data/airbnb_base.parquet" \
+    --vector_path "data/airbnb/knowledge_graph/KnowWhereGraph/transe_vector/vectorDf.parquet" \
+    --output_path "data/airbnb/ml_data/airbnb_hybrid_transe_KnowWhereGraph.parquet"
+
+python modeling/xgboost_regression.py \
+    -p data/airbnb/ml_data/airbnb_hybrid_transe_KnowWhereGraph.parquet \
+    -d 2017-04-01
+
+python data_preparation/complex.py \
+    --kg_path "data/airbnb/knowledge_graph/KnowWhereGraph/knowledgegraph" \
+    --log_dir "data/airbnb/knowledge_graph/KnowWhereGraph/complex_vector" \
+    --model "complex" \
+    --device "cuda:0" \
+    --checkpoint "/ceph/mboeckli/stkg_comparison/checkpoints"
+
+python data_preparation/complex_vector.py \
+    --folder_path data/airbnb/knowledge_graph/KnowWhereGraph/complex_vector \
+    --output_path data/airbnb/knowledge_graph/KnowWhereGraph/complex_vector/vectorDf.parquet \
+    --grid_id_path data/airbnb/base_data/grid/part-00000-e1a0cb12-251b-4af2-975e-acc9fc46ad82-c000.snappy.parquet \
+    --mapper_path data/airbnb/base_data/h3_s2_data.parquet
+
+python use_cases/airbnb/vector_join.py \
+    --base_path "data/airbnb/ml_data/airbnb_base.parquet" \
+    --vector_path "data/airbnb/knowledge_graph/KnowWhereGraph/complex_vector/vectorDf.parquet" \
+    --output_path "data/airbnb/ml_data/airbnb_hybrid_complex_KnowWhereGraph.parquet"
+
+python modeling/xgboost_regression.py \
+    -p data/airbnb/ml_data/airbnb_hybrid_complex_KnowWhereGraph.parquet \
+    -d 2017-04-01
